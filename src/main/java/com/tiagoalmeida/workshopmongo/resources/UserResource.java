@@ -1,14 +1,17 @@
 package com.tiagoalmeida.workshopmongo.resources;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tiagoalmeida.workshopmongo.domain.User;
+import com.tiagoalmeida.workshopmongo.dto.UserDto;
 import com.tiagoalmeida.workshopmongo.services.UserService;
 
 @RestController
@@ -19,9 +22,17 @@ public class UserResource {
 	private UserService service;
 	
 	@RequestMapping(method = RequestMethod.GET)
-	public ResponseEntity<List<User>> findAll() {
+	public ResponseEntity<List<UserDto>> findAll() {
 		List<User> list = service.findAll();
-		return ResponseEntity.ok().body(list);
+		List<UserDto> listDto = list.stream().map(x -> new UserDto(x)).collect(Collectors.toList());
+		return ResponseEntity.ok().body(listDto);
+	}
+	
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public ResponseEntity<UserDto> findById(@PathVariable String id) {
+		User user = service.findById(id);
+		UserDto userDto = new UserDto(user);
+		return ResponseEntity.ok(userDto);
 	}
 
 }
